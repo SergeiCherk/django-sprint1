@@ -1,4 +1,5 @@
 from django.shortcuts import render
+from django.http import Http404
 
 posts = [
     {
@@ -43,14 +44,19 @@ posts = [
     },
 ]
 
+# Создаём словарь для быстрого поиска постов по id
+POSTS_DICT = {post['id']: post for post in posts}
+
 
 def index(request):
     context = {'posts': posts}
     return render(request, 'blog/index.html', context)
 
 
-def post_detail(request, id):
-    post = posts[id]
+def post_detail(request, post_id):
+    post = POSTS_DICT.get(post_id)
+    if post is None:
+        raise Http404('Пост не найден')
     context = {'post': post}
     return render(request, 'blog/detail.html', context)
 
